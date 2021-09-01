@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_login"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        />
+
+    <Button
+        android:id="@+id/btn_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_send_message"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/btn_login"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:text="@string/login_success_times"
+        android:textSize="16sp"
+        android:layout_below="@+id/btn_message"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/login_suc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:textSize="16sp"
+        android:layout_toEndOf="@id/appCompatTextView2"
+        android:layout_below="@+id/btn_message"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/minimum_login_duration"
+        android:textSize="16sp"
+        android:layout_below="@id/appCompatTextView2"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/first_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:textSize="16sp"
+        android:layout_below="@id/login_suc"
+        android:layout_toEndOf="@+id/appCompatTextView6"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/maximum_login_duration"
+        android:textSize="16sp"
+        android:layout_below="@+id/first_login"
+
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/last_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:textSize="16sp"
+        android:layout_below="@+id/first_login"
+        android:layout_toEndOf="@+id/appCompatTextView7"
+        />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:text="@string/send_success_times"
+        android:textSize="16sp"
+        android:layout_below="@+id/last_login"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/send_suc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/last_login"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/appCompatTextView3"
+        android:textSize="16sp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/shortest_time_for_message"
+        android:textSize="16sp"
+        android:layout_below="@+id/send_suc"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/first_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:textSize="16sp"
+        android:layout_below="@+id/send_suc"
+        android:layout_toEndOf="@+id/appCompatTextView4"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/maximum_time_for_message"
+        android:textSize="16sp"
+        android:layout_below="@+id/first_send"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/last_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:layout_below="@+id/appCompatTextView5"
+        android:layout_marginStart="20dp"
+        />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/last_send"
+        android:layout_marginTop="20dp"
+        >
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            />
+
+    </ScrollView>
+
+
+
+</RelativeLayout>
