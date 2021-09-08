@@ -15,7 +15,7 @@ object InputFileUtil {
             if(file.exists()){
                 file.delete()
             }
-            EMLog.e("file", file.path)
+            EMLog.e("CsvFile", "msg_info.csv create")
             val bufferWriter = BufferedWriter(FileWriter(file, true))
             val inputString = "%s,%s,%s,%s,%s,%s"
             bufferWriter.write(
@@ -33,11 +33,13 @@ object InputFileUtil {
             bufferWriter.close()
         }catch (e: IOException){
             e.printStackTrace()
+            EMLog.e("CsvFile", "msg_info.csv create:" + e.message)
         }
     }
 
     fun writeMsg2CsvFile(context: Context, bean:TestMessageBean){
         try {
+            EMLog.e("CsvFile", "writeMsg2CsvFile:" + bean.mid)
             val file = File(context.getExternalFilesDir(null)?.absolutePath + File.separator + "msg_info.csv")
             val bufferWriter = BufferedWriter(FileWriter(file, true))
             val inputString = "\t%s\t,\t%s\t,\t%s\t,\t%s\t,\t%s\t,\t%s\t"
@@ -56,6 +58,7 @@ object InputFileUtil {
             bufferWriter.close()
         }catch (e: IOException){
             e.printStackTrace()
+            EMLog.e("CsvFile", bean.mid + ":" + e.message)
         }
     }
 
@@ -65,6 +68,7 @@ object InputFileUtil {
             if(file.exists()){
                 file.delete()
             }
+            EMLog.e("CsvFile", "login_info.csv create")
             val bufferWriter = BufferedWriter(FileWriter(file, true))
             val inputString = "%s,%s,%s,%s"
             bufferWriter.write(
@@ -80,13 +84,14 @@ object InputFileUtil {
             bufferWriter.close()
         }catch (e: IOException){
             e.printStackTrace()
+            EMLog.e("CsvFile", "login_info.csv create:" + e.message)
         }
     }
 
     fun writeLogin2CsvFile(context: Context, bean:TestLoginBean){
         try {
+            EMLog.e("CsvFile", "writeLogin2CsvFile:" + bean.loginTime)
             val file = File(context.getExternalFilesDir(null)?.absolutePath + File.separator + "login_info.csv")
-            EMLog.e("file", file.path)
             val bufferWriter = BufferedWriter(FileWriter(file, true))
             val inputString = "\t%s\t,\t%s\t,\t%s\t,\t%s\t"
             bufferWriter.write(
@@ -102,6 +107,7 @@ object InputFileUtil {
             bufferWriter.close()
         }catch (e: IOException){
             e.printStackTrace()
+            EMLog.e("CsvFile", bean.loginTime + ":" + e.message)
         }
     }
 }

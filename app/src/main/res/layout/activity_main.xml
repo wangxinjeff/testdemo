@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="@string/test_login"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         />
 
     <Button
@@ -25,6 +25,15 @@
         android:layout_below="@+id/btn_login"
         />
 
+    <Button
+        android:id="@+id/btn_log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/write_log"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/btn_message"/>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appCompatTextView2"
         android:layout_width="wrap_content"
@@ -33,7 +42,7 @@
         android:layout_marginStart="20dp"
         android:text="@string/login_success_times"
         android:textSize="16sp"
-        android:layout_below="@+id/btn_message"
+        android:layout_below="@+id/btn_log"
         />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -44,7 +53,7 @@
         android:layout_marginStart="10dp"
         android:textSize="16sp"
         android:layout_toEndOf="@id/appCompatTextView2"
-        android:layout_below="@+id/btn_message"
+        android:layout_below="@+id/btn_log"
         />
 
     <androidx.appcompat.widget.AppCompatTextView

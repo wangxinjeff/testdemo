@@ -2,6 +2,7 @@
     <string name="app_name">Easemob Test</string>
     <string name="test_login">Test login 1000 times</string>
     <string name="test_send_message">Test send messages 1000 times</string>
+    <string name="write_log">write the log</string>
     <string name="login_success_times">Login success times:</string>
     <string name="minimum_login_duration">Minimum Login Duration:</string>
     <string name="maximum_login_duration">Maximum Login Duration:</string>

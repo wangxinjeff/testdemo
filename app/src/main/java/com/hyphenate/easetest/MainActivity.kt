@@ -71,19 +71,21 @@ class MainActivity : AppCompatActivity() {
     // 登录token Login token
     private var loginToken = ""
 
-    lateinit var handler: Handler
+    private lateinit var handler: Handler
+
+    private lateinit var serviceIntent: Intent
+
+    private val infoList = mutableListOf<TestLoginBean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handler = object: Handler(this.mainLooper){
+        handler = object : Handler(this.mainLooper) {
             override fun handleMessage(msg: Message) {
-                when(msg.what){
+                when (msg.what) {
                     0 -> {
-                        Thread.sleep(300)
                         loginTest()
                     }
                     1 -> {
-                        Thread.sleep(100)
                         messageTest()
                     }
                 }
@@ -98,8 +100,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        InputFileUtil.writeLoginCsvTitle(this)
-        startService(Intent(this, OtherProcessService::class.java))
+        serviceIntent = Intent(this, OtherProcessService::class.java)
+        startService(serviceIntent)
 
         initView()
     }
@@ -110,6 +112,10 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
         dialog = builder.create()
 
+        binding.btnLog.setOnClickListener { v ->
+            writeLog()
+        }
+
         binding.btnLogin.setOnClickListener { v ->
             dialog.show()
             EMClient.getInstance().logout(false)
@@ -118,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             loginFaiLimit = 0
             loginFirstTime = 0L
             loginLastTime = 0L
-            handler.sendMessage(Message.obtain(handler, 0, ""))
+            handler.sendEmptyMessageDelayed(0, 300)
         }
 
         binding.btnMessage.setOnClickListener { v ->
@@ -170,9 +176,9 @@ class MainActivity : AppCompatActivity() {
         EMLog.e(TAG, "loginNumber=$loginLimit")
         val startLogin = System.currentTimeMillis()
 
-        if(loginToken.isNotEmpty()){
+        if (loginToken.isNotEmpty()) {
             EMLog.e(TAG, "loginWithToken")
-            EMClient.getInstance().loginWithToken(username, loginToken, object: EMCallBack{
+            EMClient.getInstance().loginWithToken(username, loginToken, object : EMCallBack {
                 @SuppressLint("SetTextI18n")
                 override fun onSuccess() {
                     runOnUiThread {
@@ -185,15 +191,23 @@ class MainActivity : AppCompatActivity() {
                             loginFirstTime = loginTime
                         }
 
-                        InputFileUtil.writeLogin2CsvFile(this@MainActivity, TestLoginBean(startLogin.toString(), true, successTime.toString(), loginTime.toString()))
+                        infoList.add(
+                            TestLoginBean(
+                                startLogin.toString(),
+                                true,
+                                successTime.toString(),
+                                loginTime.toString()
+                            )
+                        )
 
                         loginSucLimit++
                         showLoginParam()
-                        binding.tvLog.text = binding.tvLog.text.toString() + "Login for the $loginLimit times: succeeded, elapsed time : $loginTime ms \n"
+                        binding.tvLog.text =
+                            binding.tvLog.text.toString() + "Login for the $loginLimit times: succeeded, elapsed time : $loginTime ms \n"
                         binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                         if (loginLimit < loginTotal) {
                             EMClient.getInstance().logout(false)
-                            handler.sendMessage(Message.obtain(handler, 0, ""))
+                            handler.sendEmptyMessageDelayed(0, 300)
                         } else {
                             EMLog.e(
                                 TAG,
@@ -212,10 +226,12 @@ class MainActivity : AppCompatActivity() {
                             "Login failed, $code : $error"
                         )
 
-                        InputFileUtil.writeLogin2CsvFile(this@MainActivity, TestLoginBean(startLogin.toString(), false, "", ""))
+                        infoList.add(TestLoginBean(startLogin.toString(), false, "", ""))
+
                         loginFaiLimit++
                         showLoginParam()
-                        binding.tvLog.text = binding.tvLog.text.toString() + "Login for the $loginLimit times: failed \n"
+                        binding.tvLog.text =
+                            binding.tvLog.text.toString() + "Login for the $loginLimit times: failed \n"
                         binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                         if (loginLimit < loginTotal) {
                             loginTest()
@@ -233,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
             })
-        }else {
+        } else {
             EMLog.e(TAG, "login")
             EMClient.getInstance().login(username, password, object : EMCallBack {
                 @SuppressLint("SetTextI18n")
@@ -248,15 +264,24 @@ class MainActivity : AppCompatActivity() {
                             loginFirstTime = loginTime
                         }
 
-                        InputFileUtil.writeLogin2CsvFile(this@MainActivity, TestLoginBean(startLogin.toString(), true, successTime.toString(), loginTime.toString()))
+                        infoList.add(
+                            TestLoginBean(
+                                startLogin.toString(),
+                                true,
+                                successTime.toString(),
+                                loginTime.toString()
+                            )
+                        )
+
                         loginSucLimit++
                         loginToken = EMClient.getInstance().accessToken
                         showLoginParam()
-                        binding.tvLog.text = binding.tvLog.text.toString() + "Login for the $loginLimit times: succeeded, elapsed time: $loginTime ms \n"
+                        binding.tvLog.text =
+                            binding.tvLog.text.toString() + "Login for the $loginLimit times: succeeded, elapsed time: $loginTime ms \n"
 
                         if (loginLimit < loginTotal) {
                             EMClient.getInstance().logout(false)
-                            handler.sendMessage(Message.obtain(handler, 0, ""))
+                            handler.sendEmptyMessageDelayed(0, 300)
                         } else {
                             EMLog.e(
                                 TAG,
@@ -275,10 +300,12 @@ class MainActivity : AppCompatActivity() {
                             "Login failed, $code : $error"
                         )
 
-                        InputFileUtil.writeLogin2CsvFile(this@MainActivity, TestLoginBean(startLogin.toString(), false, "", ""))
+                        infoList.add(TestLoginBean(startLogin.toString(), false, "", ""))
+
                         loginFaiLimit++
                         showLoginParam()
-                        binding.tvLog.text = binding.tvLog.text.toString() + "Login for the $loginLimit times: failed \n"
+                        binding.tvLog.text =
+                            binding.tvLog.text.toString() + "Login for the $loginLimit times: failed \n"
                         if (loginLimit < loginTotal) {
                             loginTest()
                         } else {
@@ -322,10 +349,11 @@ class MainActivity : AppCompatActivity() {
                     }
                     sendSucLimit++
                     showSendParam()
-                    binding.tvLog.text = binding.tvLog.text.toString() + "Send message for the $sendLimit times: succeeded, elapsed time:$sendTime  ms \n"
+                    binding.tvLog.text =
+                        binding.tvLog.text.toString() + "Send message for the $sendLimit times: succeeded, elapsed time:$sendTime  ms \n"
                     binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                     if (sendLimit < sendTotal) {
-                        handler.sendMessage(Message.obtain(handler, 1, ""))
+                        handler.sendEmptyMessageDelayed(1, 100)
                     } else {
                         EMLog.e(
                             TAG,
@@ -347,7 +375,8 @@ class MainActivity : AppCompatActivity() {
 
                     sendFaiLimit++
                     showSendParam()
-                    binding.tvLog.text = binding.tvLog.text.toString() + "Send message for the $sendLimit time: failed \n"
+                    binding.tvLog.text =
+                        binding.tvLog.text.toString() + "Send message for the $sendLimit time: failed \n"
                     binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                     if (sendLimit < sendTotal) {
                         messageTest()
@@ -388,6 +417,26 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         stopService(Intent(applicationContext, OtherProcessService::class.java))
         handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun writeLog() {
+        if (infoList.size > 0) {
+            infoList.forEach { info ->
+                EMLog.e(
+                    TAG,
+                    "Login Start timestamp: " + info.loginTime
+                            + ", Login succeeded: " + info.isSuccess
+                            + ", Login Success timestamp: " + info.successTime
+                            + ", Login time consuming: " + info.elapsedTime
+                )
+            }
+            InputFileUtil.writeLoginCsvTitle(this)
+            infoList.forEach { info ->
+                InputFileUtil.writeLogin2CsvFile(this@MainActivity, info)
+            }
+            infoList.clear()
+        }
+        startService(serviceIntent)
     }
 }
 
