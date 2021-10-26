@@ -4,6 +4,7 @@
 1.Modify your parameters on the MainActivity.kt
 2.Modify your parameters on the OtherProcessService.kt
 3.Run project tests
+4.When the test is complete, click the button to write the CSV file
 
 ## information
    

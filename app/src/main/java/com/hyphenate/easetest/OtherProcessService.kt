@@ -22,7 +22,7 @@ class OtherProcessService : Service() {
      * appkey，登录的账号、密码
      * Appkey, login account, password
      */
-    private val appkey = "1193210624041558#chat-demo"
+    private val appkey = "41351358#427351"
     private val username = "easemobtest2"
     private val password = "1"
 

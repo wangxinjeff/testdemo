@@ -15,6 +15,10 @@ import com.hyphenate.chat.EMMessage
 import com.hyphenate.chat.EMOptions
 import com.hyphenate.easetest.databinding.ActivityMainBinding
 import com.hyphenate.util.EMLog
+import okhttp3.*
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -23,10 +27,12 @@ class MainActivity : AppCompatActivity() {
      * appkey，登录的账号、密码，接收方id
      * Appkey, login account, password, and receiver ID
      */
-    private val appkey = "1193210624041558#chat-demo"
+    private val appkey = "41351358#427351"
     private val username = "easemobtest1"
     private val password = "1"
     private val toUsername = "easemobtest2"
+
+    private val tokenUrl = "http://a41.easemob.com/app/chat/user/login"
 
     private val TAG = "Easemob"
 
@@ -96,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         option.appKey = appkey
         option.autoLogin = false
         EMClient.getInstance().init(this, option)
+        EMClient.getInstance().setDebugMode(true)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -119,12 +126,26 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener { v ->
             dialog.show()
             EMClient.getInstance().logout(false)
-            loginLimit = 0
-            loginSucLimit = 0
-            loginFaiLimit = 0
-            loginFirstTime = 0L
-            loginLastTime = 0L
-            handler.sendEmptyMessageDelayed(0, 300)
+
+            fetchAgoraToken(object : EMCallBack {
+                override fun onSuccess() {
+                    loginLimit = 0
+                    loginSucLimit = 0
+                    loginFaiLimit = 0
+                    loginFirstTime = 0L
+                    loginLastTime = 0L
+                    handler.sendEmptyMessageDelayed(0, 300)
+                }
+
+                override fun onError(code: Int, error: String?) {
+                    dialog.dismiss()
+                    EMLog.e(TAG, "fetchAgoraToken onError:$code, $error")
+                }
+
+                override fun onProgress(progress: Int, status: String?) {
+
+                }
+            })
         }
 
         binding.btnMessage.setOnClickListener { v ->
@@ -169,6 +190,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun fetchAgoraToken(callback: EMCallBack){
+        val reqBody = JSONObject()
+        reqBody.put("userAccount", username)
+        reqBody.put("userPassword", password)
+
+        val okHttpClient = OkHttpClient.Builder().build()
+        val mediaType = MediaType.parse("application/json")
+        val requestBody = RequestBody.create(mediaType, reqBody.toString())
+        val request = Request.Builder()
+            .url(tokenUrl)
+            .post(requestBody)
+            .build()
+        val call = okHttpClient.newCall(request)
+        call.enqueue(object: Callback{
+            override fun onFailure(call: Call?, e: IOException?) {
+                callback.onError(0, e?.message)
+            }
+
+            override fun onResponse(call: Call?, response: Response?) {
+                if(response != null){
+                    val responseBody = response.body().string()
+                    EMLog.e(TAG, responseBody)
+                    if(response.code() == 200){
+                        try{
+                            val result = JSONObject(responseBody)
+                            loginToken = result.getString("accessToken")
+                            callback.onSuccess()
+                        }catch (e:JSONException){
+                            e.printStackTrace()
+                        }
+                    }else {
+                        callback.onError(response.code(), response.message())
+                    }
+                }else{
+                    callback.onError(0, "response is null")
+                }
+            }
+        })
+    }
+
     @Synchronized
     private fun loginTest() {
         loginLimit++
@@ -178,7 +239,7 @@ class MainActivity : AppCompatActivity() {
 
         if (loginToken.isNotEmpty()) {
             EMLog.e(TAG, "loginWithToken")
-            EMClient.getInstance().loginWithToken(username, loginToken, object : EMCallBack {
+            EMClient.getInstance().loginWithAgoraToken(username, loginToken, object : EMCallBack {
                 @SuppressLint("SetTextI18n")
                 override fun onSuccess() {
                     runOnUiThread {
@@ -250,79 +311,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         } else {
-            EMLog.e(TAG, "login")
-            EMClient.getInstance().login(username, password, object : EMCallBack {
-                @SuppressLint("SetTextI18n")
-                override fun onSuccess() {
-                    runOnUiThread {
-                        val successTime = System.currentTimeMillis()
-                        val loginTime = successTime - startLogin
-                        if (loginTime > loginLastTime || loginLastTime == 0L) {
-                            loginLastTime = loginTime
-                        }
-                        if (loginTime < loginFirstTime || loginFirstTime == 0L) {
-                            loginFirstTime = loginTime
-                        }
-
-                        infoList.add(
-                            TestLoginBean(
-                                startLogin.toString(),
-                                true,
-                                successTime.toString(),
-                                loginTime.toString()
-                            )
-                        )
-
-                        loginSucLimit++
-                        loginToken = EMClient.getInstance().accessToken
-                        showLoginParam()
-                        binding.tvLog.text =
-                            binding.tvLog.text.toString() + "Login for the $loginLimit times: succeeded, elapsed time: $loginTime ms \n"
-
-                        if (loginLimit < loginTotal) {
-                            EMClient.getInstance().logout(false)
-                            handler.sendEmptyMessageDelayed(0, 300)
-                        } else {
-                            EMLog.e(
-                                TAG,
-                                "Login test 1000 times，successNumber=$loginSucLimit, failNumber=$loginFaiLimit"
-                            )
-                            dialog.dismiss()
-                        }
-                    }
-                }
-
-                @SuppressLint("SetTextI18n")
-                override fun onError(code: Int, error: String?) {
-                    runOnUiThread {
-                        EMLog.e(
-                            TAG,
-                            "Login failed, $code : $error"
-                        )
-
-                        infoList.add(TestLoginBean(startLogin.toString(), false, "", ""))
-
-                        loginFaiLimit++
-                        showLoginParam()
-                        binding.tvLog.text =
-                            binding.tvLog.text.toString() + "Login for the $loginLimit times: failed \n"
-                        if (loginLimit < loginTotal) {
-                            loginTest()
-                        } else {
-                            EMLog.e(
-                                TAG,
-                                "Login test 1000 times，successNumber=$loginSucLimit, failNumber=$loginFaiLimit"
-                            )
-                            dialog.dismiss()
-                        }
-                    }
-                }
-
-                override fun onProgress(progress: Int, status: String?) {
-
-                }
-
-            })
+            EMLog.e(TAG, "AgoraToken isEmpty")
         }
     }
 
